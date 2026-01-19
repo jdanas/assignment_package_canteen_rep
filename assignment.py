@@ -67,10 +67,10 @@ def load_canteen_location(data_location="canteens.xlsx"):
 
     # get dictionary of {canteen:[x,y],}
     canteen_locations = {}
-    for canteen in canteens:
-        copy = canteen_data.copy()
-        copy.drop_duplicates(subset="Canteen", inplace=True)
-        canteen_locations_intermediate = copy.set_index("Canteen")["Location"].to_dict()
+    copy = canteen_data.copy()
+    copy.drop_duplicates(subset="Canteen", inplace=True)
+    canteen_locations_intermediate = copy.set_index("Canteen")["Location"].to_dict()
+
     for canteen in canteens:
         canteen_locations[canteen] = [
             int(canteen_locations_intermediate[canteen].split(",")[0]),
@@ -302,9 +302,9 @@ def search_nearest_canteens(user_locations, k):
         print("Invalid user locations. Please try again.")
         return []
 
-    # Validate k value - cannot be negative
-    if k < 0:
-        print("Warning: k cannot be negative value. Default k = 1 is set.")
+    # Validate k value - must be positive
+    if k <= 0:
+        print("Warning: k must be positive. Default k = 1 is set.")
         k = 1
 
     midpoint_x = (userA_x + userB_x) / 2
@@ -357,7 +357,15 @@ def main():
         print("4 -- Location-based Search")
         print("5 -- Exit Program")
         print("========================")
-        option = int(input("Enter option [1-5]: "))
+        try:
+            option = int(input("Enter option [1-5]: "))
+        except ValueError:
+            print("Invalid input. Please enter a number between 1 and 5.")
+            continue
+
+        if option < 1 or option > 5:
+            print("Invalid option. Please enter a number between 1 and 5.")
+            continue
 
         if option == 1:
             # print provided dictionary data structures
@@ -393,9 +401,9 @@ def main():
                 print("Invalid number. Using default k=1")
                 k = 1
 
-            # Validate k is not negative
-            if k < 0:
-                print("Warning: k cannot be negative value. Default k = 1 is set.")
+            # Validate k is positive
+            if k <= 0:
+                print("Warning: k must be positive. Default k = 1 is set.")
                 k = 1
 
             # call location-based search function
