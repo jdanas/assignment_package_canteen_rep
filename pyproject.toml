@@ -1,0 +1,12 @@
+[project]
+name = "assignment-package-canteen-rep"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.14"
+dependencies = [
+    "arcade>=3.0.0",
+    "pandas>=2.0.0",
+    "openpyxl>=3.0.0",
+    "pillow>=10.0.0",
+]
