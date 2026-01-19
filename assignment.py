@@ -178,14 +178,36 @@ class MapWindow(arcade.Window):
                 arcade.schedule(lambda dt: self.close(), 0.5)
 
 
+# Track if arcade has been used (can only run once per process)
+_arcade_has_run = False
+
+
 # get both user locations with the use of Arcade
 def get_user_locations_interface():
+    global _arcade_has_run
+
+    # Check if arcade.run() has already been called
+    if _arcade_has_run:
+        print("\n" + "=" * 60)
+        print("WARNING: Arcade can only be used once per program session.")
+        print("This is a limitation of the arcade/pyglet library.")
+        print("\nTo use location-based search again:")
+        print("  1. Exit the program (option 5)")
+        print("  2. Restart: uv run assignment.py")
+        print("  3. Select option 4 again")
+        print("=" * 60 + "\n")
+        return (None, None), (None, None)
+
     image_location = "NTUcampus.jpg"
     pin_location = "pin.png"
     screen_title = "NTU Map - Select User Locations"
 
     window = MapWindow(image_location, pin_location, screen_title)
     window.setup()
+
+    # Mark that arcade has been run
+    _arcade_has_run = True
+
     arcade.run()
 
     return window.userA_location, window.userB_location
