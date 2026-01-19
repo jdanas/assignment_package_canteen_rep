@@ -1,4 +1,4 @@
-import arcade
+import pygame
 from PIL import Image
 import pandas as pd
 import math
@@ -80,16 +80,21 @@ def load_canteen_location(data_location="canteens.xlsx"):
     return canteen_locations
 
 
-# Arcade window class for map interface - handles both user locations
-class MapWindow(arcade.Window):
+# Pygame window class for map interface - handles both user locations
+class MapWindow:
     def __init__(self, image_location, pin_location, screen_title):
-        # get image dimensions
+        # Initialize pygame
+        pygame.init()
+
+        # Get image dimensions
         image = Image.open(image_location)
         self.image_width_original, self.image_height_original = image.size
         self.scaled_width = int(self.image_width_original * 0.9)
         self.scaled_height = int(self.image_height_original * 0.9)
 
-        super().__init__(self.scaled_width, self.scaled_height, screen_title)
+        # Create window
+        self.screen = pygame.display.set_mode((self.scaled_width, self.scaled_height))
+        pygame.display.set_caption(screen_title)
 
         self.image_location = image_location
         self.pin_location = pin_location
@@ -99,66 +104,88 @@ class MapWindow(arcade.Window):
         # Track both users
         self.user_locations = []  # List to store both user locations
         self.current_user = 1  # Which user we're getting location for (1 or 2)
-        self.instruction_text = None
 
         self.userA_location = (None, None)
         self.userB_location = (None, None)
 
+        # Font for instructions
+        self.font = pygame.font.SysFont("Arial", 20, bold=True)
+
+        # Clock for controlling frame rate
+        self.clock = pygame.time.Clock()
+
+        # Running flag
+        self.running = True
+
+        # Close delay
+        self.close_timer = None
+
     def setup(self):
-        # Load the background image
-        self.background = arcade.load_texture(self.image_location)
-        # Load the pin image
-        self.pin = arcade.load_texture(self.pin_location)
-
-        # Create Text object for instructions (eliminates performance warning)
-        self.instruction_text = arcade.Text(
-            "Click to select User A's location",
-            self.scaled_width // 2,
-            self.scaled_height - 30,
-            arcade.color.WHITE,
-            20,
-            anchor_x="center",
-            bold=True,
+        # Load and scale the background image
+        background_img = pygame.image.load(self.image_location)
+        self.background = pygame.transform.scale(
+            background_img, (self.scaled_width, self.scaled_height)
         )
 
-    def on_draw(self):
-        # Clear the screen
-        self.clear()
+        # Load and scale the pin image
+        pin_img = pygame.image.load(self.pin_location)
+        self.pin = pygame.transform.scale(pin_img, (60, 60))
 
+    def get_instruction_text(self):
+        """Get current instruction text based on state"""
+        if self.current_user == 1:
+            return "Click to select User A's location"
+        elif self.current_user == 2:
+            return "Click to select User B's location"
+        else:
+            return "Both locations selected. Closing..."
+
+    def draw(self):
         # Draw the background image
-        arcade.draw_texture_rect(
-            self.background, arcade.LBWH(0, 0, self.scaled_width, self.scaled_height)
-        )
+        self.screen.blit(self.background, (0, 0))
 
         # Draw all placed pins
         for location in self.user_locations:
             x, y = location
-            arcade.draw_texture_rect(self.pin, arcade.LBWH(x - 30, y - 30, 60, 60))
+            self.screen.blit(self.pin, (x - 30, y - 30))
 
-        # Update instruction text based on current user
-        if self.current_user == 1:
-            self.instruction_text.text = "Click to select User A's location"
-        elif self.current_user == 2:
-            self.instruction_text.text = "Click to select User B's location"
-        else:
-            self.instruction_text.text = "Both locations selected. Closing..."
+        # Get instruction text
+        instruction_text = self.get_instruction_text()
+
+        # Render text
+        text_surface = self.font.render(instruction_text, True, (255, 255, 255))
+        text_rect = text_surface.get_rect()
+
+        # Center text at top
+        text_rect.centerx = self.scaled_width // 2
+        text_rect.top = 30
 
         # Draw semi-transparent background rectangle for text visibility
-        text_width = len(self.instruction_text.text) * 12
-        arcade.draw_lbwh_rectangle_filled(
-            self.scaled_width // 2 - text_width // 2,  # left edge (centered)
-            self.scaled_height - 50,  # bottom edge
-            text_width,  # width
-            40,  # height
-            (0, 0, 0, 180),  # black with 180/255 alpha
+        padding = 10
+        background_rect = pygame.Rect(
+            text_rect.left - padding,
+            text_rect.top - padding,
+            text_rect.width + 2 * padding,
+            text_rect.height + 2 * padding,
         )
 
-        # Draw instruction text on top of background
-        self.instruction_text.draw()
+        # Create semi-transparent surface
+        s = pygame.Surface((background_rect.width, background_rect.height))
+        s.set_alpha(180)
+        s.fill((0, 0, 0))
+        self.screen.blit(s, background_rect.topleft)
 
-    def on_mouse_press(self, x, y, button, modifiers):
-        # Handle mouse click
-        if button == arcade.MOUSE_BUTTON_LEFT and self.current_user <= 2:
+        # Draw instruction text on top
+        self.screen.blit(text_surface, text_rect)
+
+        # Update display
+        pygame.display.flip()
+
+    def handle_mouse_click(self, pos):
+        """Handle mouse click event"""
+        x, y = pos
+
+        if self.current_user <= 2:
             # Store the clicked location
             self.user_locations.append((x, y))
 
@@ -174,41 +201,44 @@ class MapWindow(arcade.Window):
                 self.userB_location = (mouseX_scaled, mouseY_scaled)
                 print(f"User B's location (x, y): {self.userB_location}")
                 self.current_user = 3
-                # Close window after brief delay
-                arcade.schedule(lambda dt: self.close(), 0.5)
+                # Set close timer (0.5 seconds)
+                self.close_timer = pygame.time.get_ticks() + 500
+
+    def run(self):
+        """Main event loop"""
+        while self.running:
+            # Handle events
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    self.running = False
+                elif event.type == pygame.MOUSEBUTTONDOWN:
+                    if event.button == 1:  # Left mouse button
+                        self.handle_mouse_click(event.pos)
+
+            # Draw everything
+            self.draw()
+
+            # Check close timer
+            if self.close_timer is not None:
+                if pygame.time.get_ticks() >= self.close_timer:
+                    self.running = False
+
+            # Control frame rate
+            self.clock.tick(60)
+
+        # Cleanup
+        pygame.quit()
 
 
-# Track if arcade has been used (can only run once per process)
-_arcade_has_run = False
-
-
-# get both user locations with the use of Arcade
+# get both user locations with pygame interface
 def get_user_locations_interface():
-    global _arcade_has_run
-
-    # Check if arcade.run() has already been called
-    if _arcade_has_run:
-        print("\n" + "=" * 60)
-        print("WARNING: Arcade can only be used once per program session.")
-        print("This is a limitation of the arcade/pyglet library.")
-        print("\nTo use location-based search again:")
-        print("  1. Exit the program (option 5)")
-        print("  2. Restart: uv run assignment.py")
-        print("  3. Select option 4 again")
-        print("=" * 60 + "\n")
-        return (None, None), (None, None)
-
     image_location = "NTUcampus.jpg"
     pin_location = "pin.png"
     screen_title = "NTU Map - Select User Locations"
 
     window = MapWindow(image_location, pin_location, screen_title)
     window.setup()
-
-    # Mark that arcade has been run
-    _arcade_has_run = True
-
-    arcade.run()
+    window.run()
 
     return window.userA_location, window.userB_location
 

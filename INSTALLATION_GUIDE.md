@@ -112,7 +112,7 @@ source venv/bin/activate  # macOS/Linux
 venv\Scripts\activate     # Windows
 
 # Install each dependency
-pip install arcade==3.3.3
+pip install pygame==2.6.1
 pip install pandas==2.3.3
 pip install openpyxl==3.1.5
 pip install pillow==11.3.0
@@ -153,10 +153,10 @@ After installation, verify everything works:
 
 ```bash
 # Test import
-uv run python -c "import arcade; import pandas; print('✅ All imports successful!')"
+uv run python -c "import pygame; import pandas; print('✅ All imports successful!')"
 
 # Or with standard Python (after activation):
-python -c "import arcade; import pandas; print('✅ All imports successful!')"
+python -c "import pygame; import pandas; print('✅ All imports successful!')"
 ```
 
 Expected output: `✅ All imports successful!`
@@ -185,14 +185,14 @@ source venv/bin/activate
 venv\Scripts\activate
 ```
 
-### "ModuleNotFoundError: No module named 'arcade'"
+### "ModuleNotFoundError: No module named 'pygame'"
 Ensure:
 1. Virtual environment is activated (check prompt)
 2. Dependencies were installed successfully
-3. Try reinstalling: `pip install -r requirements.txt`
+3. Try reinstalling: `uv sync` or `pip install -r requirements.txt`
 
 ### On macOS with Apple Silicon (M1/M2/M3)
-Arcade should work fine, but if you have issues:
+Pygame should work fine with automatic compilation. If you encounter issues:
 ```bash
 # Use native Python (not Rosetta)
 /opt/homebrew/bin/python3 --version

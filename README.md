@@ -7,13 +7,13 @@ A Python-based food and beverage recommendation system for NTU (Nanyang Technolo
 - **Keyword-based Search**: Find stalls by food type, cuisine, and dietary preferences (e.g., "Halal", "Spicy", "Chinese")
 - **Price-based Search**: Search for stalls within your budget using keyword filtering
 - **Location-based Search**: Find the k-nearest canteens to two user locations on an interactive map
-- **Interactive Map Interface**: Click on the NTU campus map to select user locations (powered by Arcade)
+- **Interactive Map Interface**: Click on the NTU campus map to select user locations (powered by Pygame)
 - **Data-driven Results**: All information sourced from Excel spreadsheet with comprehensive canteen and stall data
 
 ## Technology Stack
 
 - **Language**: Python 3.14+
-- **UI Framework**: Arcade 3.3.3 (for interactive map)
+- **UI Framework**: Pygame 2.6.1 (for interactive map)
 - **Data Processing**: Pandas 2.3.3, OpenPyXL 3.1.5
 - **Image Processing**: Pillow 11.3.0
 - **Package Manager**: UV (optional, but recommended)
@@ -78,7 +78,7 @@ venv\Scripts\activate
 
 4. Install dependencies from `pyproject.toml`:
 ```bash
-pip install arcade==3.3.3 pandas==2.3.3 openpyxl==3.1.5 pillow==11.3.0
+pip install pygame==2.6.1 pandas==2.3.3 openpyxl==3.1.5 pillow==11.3.0
 ```
 
 Or create a `requirements.txt` file with these contents and run:
@@ -193,8 +193,7 @@ Food Court 16 – 272m
 ```
 
 **Important Notes for Location-based Search:**
-- The arcade/map interface can only be used once per program session (library limitation)
-- If you need to use it again, restart the program (select option 5, then run again)
+- The map interface can now be used multiple times per session (Pygame doesn't have session limitations)
 - Distance is measured as Euclidean distance from the midpoint of the two user locations
 - k defaults to 1 if invalid or negative value is entered
 
@@ -280,7 +279,7 @@ Interactive map interface to select two user locations on campus.
 
 ## Troubleshooting
 
-### Issue: "No module named 'arcade'" or missing dependencies
+### Issue: "No module named 'pygame'" or missing dependencies
 
 **Solution:** Make sure you've installed dependencies:
 ```bash
@@ -291,12 +290,7 @@ uv sync
 pip install -r requirements.txt
 ```
 
-### Issue: "Location-based Search failed - RuntimeError: No window is active"
-
-**Solution:** This is a known limitation of the arcade library. The map interface can only be used once per program session. To use it again:
-1. Exit the program (option 5)
-2. Restart the application
-3. Select option 4 again
+**Note:** Pygame will compile from source automatically on first install. This is normal and may take a few minutes.
 
 ### Issue: Keyword search returns no results
 
@@ -334,22 +328,17 @@ python assignment.py
 
 - **First run**: May take 30-60 seconds as dependencies are loaded and compiled
 - **Subsequent runs**: Much faster as libraries are cached
-- **Map interface**: Uses Arcade/Pyglet for fast 2D rendering
+- **Map interface**: Uses Pygame for fast 2D rendering and can be used multiple times per session
 - **Data processing**: Uses Pandas for efficient data manipulation
 
 ## Known Limitations
 
-1. **Arcade Map Interface (One-time Use)**
-   - The map selection interface can only be used once per program session
-   - This is a limitation of the Arcade/Pyglet library's event loop
-   - Workaround: Exit and restart the program to use the map again
-
-2. **Distance Calculation**
+1. **Distance Calculation**
    - Uses Euclidean distance (straight-line distance)
    - Does not account for actual walking paths or road networks
    - Calculates from the midpoint between two users to each canteen
 
-3. **Coordinate System**
+2. **Coordinate System**
    - Uses pixel coordinates from the campus map image
    - Not actual GPS or geographic coordinates
    - Scaling: Map image is scaled to 90% of original size for display
@@ -374,7 +363,7 @@ Potential improvements for future versions:
 The application follows a modular design:
 - **Data Loading**: `load_*()` functions handle Excel file parsing
 - **Search Functions**: `search_*()` functions implement different search strategies
-- **UI**: `MapWindow` class provides interactive map interface using Arcade
+- **UI**: `MapWindow` class provides interactive map interface using Pygame
 - **Menu**: `main()` function handles CLI menu loop
 
 ### Code Quality
@@ -399,7 +388,7 @@ results = search_by_keyword(keywords)
 ## Credits
 
 - **Assignment**: RE1016 - Data Structures & Algorithms (NTU)
-- **Framework**: Arcade (arcade-py.org)
+- **Framework**: Pygame (pygame.org)
 - **Data**: NTU Campus Canteen Information
 
 ## License
