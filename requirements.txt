@@ -1,0 +1,25 @@
+# F&B Recommendation System - Python Dependencies
+# 
+# Install with: pip install -r requirements.txt
+#
+
+# Core Dependencies
+arcade==3.3.3          # 2D game/UI framework for interactive map
+pandas==2.3.3          # Data manipulation and analysis
+openpyxl==3.1.5        # Excel file reading/writing
+pillow==11.3.0         # Image processing
+
+# Transitive Dependencies (installed automatically)
+numpy==2.4.1           # Numerical computing (required by pandas)
+pyglet==2.1.12         # Window/graphics library (required by arcade)
+pymunk==6.9.0          # Physics engine (required by arcade)
+pytiled-parser==2.2.9  # Tiled map parser (required by arcade)
+attrs==25.4.0          # Class utilities
+cffi==2.0.0            # C Foreign Function Interface
+pycparser==2.23        # C parser
+python-dateutil==2.9.0.post0  # Date utilities
+pytz==2025.2           # Timezone support
+six==1.17.0            # Python 2/3 compatibility
+typing-extensions==4.15.0  # Type hints
+tzdata==2025.3         # Timezone database
+et-xmlfile==2.0.0      # XML utilities for Excel
