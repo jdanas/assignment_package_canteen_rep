@@ -4,7 +4,7 @@
 #
 
 # Core Dependencies
-pygame==2.6.1          # 2D game/UI framework for interactive map
+pygame-ce==2.5.6       # Community Edition - 2D game/UI framework for interactive map (no SDL dependencies)
 pandas==2.3.3          # Data manipulation and analysis
 openpyxl==3.1.5        # Excel file reading/writing
 pillow==11.3.0         # Image processing
