@@ -1,4 +1,4 @@
-import pygame_ce as pygame
+import pygame
 from PIL import Image
 import pandas as pd
 import math
